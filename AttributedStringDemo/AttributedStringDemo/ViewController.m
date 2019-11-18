@@ -32,9 +32,15 @@
     attribute.phc_text(@"Green").phc_textColor(UIColor.greenColor).phc_font([UIFont fontWithName:@"zapfino" size:35]);
     attribute.phc_text(@"Blue").phc_textColor(UIColor.blueColor).phc_font([UIFont fontWithName:@"Helvetica-Bold" size:30]);
     
-    attribute appendAttributedString:<#(nonnull NSAttributedString *)#>
-    
+    content = @"包含重复内容的字符串：Repeat， Repeat，Repeat，Repeat，Repeat";
+    NSMutableAttributedString *secondAtt = NSMutableAttributedString.attributedString(content);
+    secondAtt.phc_font([UIFont systemFontOfSize:20]).phc_textColor(UIColor.greenColor);
+    secondAtt.phc_text(@"Repeat").phc_textColor(UIColor.redColor);
+    secondAtt.phc_local(@(2)).phc_textColor(UIColor.blueColor);
+    secondAtt.phc_local(@(3)).phc_textColor(UIColor.brownColor);
+    [attribute appendAttributedString:secondAtt];
     self.label.attributedText = attribute;
 }
+
 
 @end

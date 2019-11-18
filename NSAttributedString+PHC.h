@@ -13,12 +13,22 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NSMutableAttributedString *_Nullable (^PHCSingleStringBlock)(NSString *string);
 typedef NSMutableAttributedString *_Nullable (^PHCSingleAttributeValueBlock)(id value);
 
+@interface NSString (PHCRange)
+
+- (NSArray<NSString *> *)allRangesOfSubString:(NSString*)subStr;
+
+@end
+
 @interface NSMutableAttributedString (PHC)
 
 + (PHCSingleStringBlock)attributedString;
 
 /// 传值为 NSString 类型，如果传入 nil 或 @"", 则当前的 operaString 为整个文字内容
 - (PHCSingleStringBlock)phc_text;
+
+/// 富文本效果第几个字符串有效，默认为 0
+/// 传值为 NSNumber（NSUInteger） 类型
+- (PHCSingleAttributeValueBlock)phc_local;
 
 /// 传值为 UIFont 类型
 - (PHCSingleAttributeValueBlock)phc_font;

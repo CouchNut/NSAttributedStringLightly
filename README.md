@@ -39,6 +39,27 @@ self.label.attributedText = attribute;
 
 上述代码不仅仅设置了不同的颜色，还设置了不同的字体，并且将代码拆分为多行，但总体上代码量还是要比使用原生实现少很多。
 
+> 字符串种包含重复数据时可根据 `phc_local` 来确认生效字符串
+
+对于字符串 @“Repeat， Repeat，Repeat，Repeat，Repeat”，如果要使第一个 Repeat 显示为红色，第三个显示为蓝色，第四个显示为棕色，其余显示为绿色，可通过以下代码实现：
+
+```
+content = @"包含重复内容的字符串：Repeat， Repeat，Repeat，Repeat，Repeat";
+NSMutableAttributedString *secondAtt = NSMutableAttributedString.attributedString(content);
+secondAtt.phc_font([UIFont systemFontOfSize:20]).phc_textColor(UIColor.greenColor);
+secondAtt.phc_text(@"Repeat").phc_textColor(UIColor.redColor);
+secondAtt.phc_local(@(2)).phc_textColor(UIColor.blueColor);
+secondAtt.phc_local(@(3)).phc_textColor(UIColor.brownColor);
+
+self.label.attributedText = secondAtt;
+```
+注意 phc_local 传的参数是从 0 开始算的，如要使第3个 Repeat 显示为蓝色，则调用 phc_local(@(2)) 即可。
+
+显示结果：
+![red_green_blue_3](./Images/red_green_blue_3.png)
+
+
+
 除了上述显示不同的颜色和字体，也可以实现其他的，例如：下划线、斜体、阴影、中空等等，具体使用方法与上述类似。
 
 **使用方法：**
@@ -48,7 +69,7 @@ self.label.attributedText = attribute;
 
 **使用注意：**
 
-1.  当文本中出现重复字符串时，使用 `.phc_text` 只会对第一次出现的字符串有效，之后的无影响，如若出现重复字符串，可单独新建一个 `NSMutableAttributedString ` 变量，最后追加或插入到原有的富文本中。
+1.  <del>当文本中出现重复字符串时，使用 `.phc_text` 只会对第一次出现的字符串有效，之后的无影响，如若出现重复字符串，可单独新建一个 `NSMutableAttributedString ` 变量，最后追加或插入到原有的富文本中。</del> 此问题已修复。（2019-11-18）
 2. 对与富文本中显示图片和链接还未做好简单处理，需自定义 `NSTextAttachment` 或 `NSURL` 变量。
 
 

@@ -9,26 +9,59 @@
 #import "NSAttributedString+PHC.h"
 #import<objc/runtime.h>
 
-static const void *PHCOperaStringKey = &PHCOperaStringKey;
-
 typedef NSMutableAttributedString *_Nullable (^PHCAddAttributeBlock)(NSAttributedStringKey attributeKey, id value);
 
-@interface NSMutableAttributedString (YTCProperty)
+@implementation NSString (PHCRange)
 
+- (NSArray<NSString *> *)allRangesOfSubString:(NSString*)subStr
+{
+    if (self.length < subStr.length) {
+        return @[];
+    }
+    
+    NSMutableArray *rangeArray = [NSMutableArray array];
+    for(int i =0; i <= self.length - subStr.length; ++i) {
+        NSRange range = NSMakeRange(i, subStr.length);
+        NSString *temp = [self substringWithRange:range];
+        if ([temp isEqualToString:subStr]) {
+            NSRange range = {i,subStr.length};
+            [rangeArray addObject:NSStringFromRange(range)];
+        }
+    }
+    
+    return rangeArray;
+}
+
+@end
+
+@interface PHCAttributedProperty : NSObject
+
+@property (nonatomic, assign) NSUInteger local;
 @property (nonatomic, copy) NSString *operaString;
 
 @end
 
+@implementation PHCAttributedProperty
+
+@end
+
+@interface NSMutableAttributedString (YTCProperty)
+
+@property (nonatomic, strong) PHCAttributedProperty *property;
+
+@end
+
+static const void *PHCPropertyKey = &PHCPropertyKey;
 @implementation NSMutableAttributedString (YTCProperty)
 
-- (NSString *)operaString
+- (PHCAttributedProperty *)property
 {
-    return objc_getAssociatedObject(self, PHCOperaStringKey);
+    return objc_getAssociatedObject(self, PHCPropertyKey);
 }
 
-- (void)setOperaString:(NSString *)operaString
+- (void)setProperty:(PHCAttributedProperty *)property
 {
-    objc_setAssociatedObject(self, PHCOperaStringKey, operaString, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    objc_setAssociatedObject(self, PHCPropertyKey, property, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end
@@ -39,7 +72,9 @@ typedef NSMutableAttributedString *_Nullable (^PHCAddAttributeBlock)(NSAttribute
 + (PHCSingleStringBlock)attributedString
 {
     return ^(NSString *string) {
-        return [[NSMutableAttributedString alloc] initWithString:string];
+        NSMutableAttributedString *result = [[NSMutableAttributedString alloc] initWithString:string];
+        result.property = [[PHCAttributedProperty alloc] init];
+        return result;
     };
 }
 
@@ -55,18 +90,34 @@ typedef NSMutableAttributedString *_Nullable (^PHCAddAttributeBlock)(NSAttribute
 - (PHCSingleStringBlock)phc_text
 {
     return ^(NSString *string) {
-        self.operaString = string.length == 0 ? self.string : string;
+        self.property.operaString = string.length == 0 ? self.string : string;
+        return self;
+    };
+}
+
+- (PHCSingleAttributeValueBlock)phc_local
+{
+    return ^(id value) {
+        if (![value isKindOfClass:NSNumber.class]) {
+            self.property.local = 0;
+        }
+        else {
+            NSNumber *number = (NSNumber *)value;
+            self.property.local = number.unsignedIntegerValue;
+        }
         return self;
     };
 }
 
 - (NSRange)phc_operationRange
 {
-    if (!self.operaString) {
+    if (!self.property.operaString) {
         return NSMakeRange(0, self.string.length);
     }
-
-    return [self.string rangeOfString:self.operaString];
+    
+    NSArray *ranges = [self.string allRangesOfSubString:self.property.operaString];
+    NSInteger index = self.property.local >= ranges.count ? 0 : self.property.local;
+    return NSRangeFromString(ranges[index]);
 }
 
 // Attributes
