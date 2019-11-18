@@ -15,7 +15,7 @@ typedef NSMutableAttributedString *_Nullable (^PHCSingleAttributeValueBlock)(id 
 
 @interface NSString (PHCRange)
 
-- (NSArray<NSString *> *)allRangesOfSubString:(NSString*)subStr;
+- (NSArray<NSString *> *)phc_allRangesOfSubString:(NSString*)subStr;
 
 @end
 

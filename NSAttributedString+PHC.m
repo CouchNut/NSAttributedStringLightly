@@ -13,7 +13,7 @@ typedef NSMutableAttributedString *_Nullable (^PHCAddAttributeBlock)(NSAttribute
 
 @implementation NSString (PHCRange)
 
-- (NSArray<NSString *> *)allRangesOfSubString:(NSString*)subStr
+- (NSArray<NSString *> *)phc_allRangesOfSubString:(NSString*)subStr
 {
     if (self.length < subStr.length) {
         return @[];
@@ -115,7 +115,7 @@ static const void *PHCPropertyKey = &PHCPropertyKey;
         return NSMakeRange(0, self.string.length);
     }
     
-    NSArray *ranges = [self.string allRangesOfSubString:self.property.operaString];
+    NSArray *ranges = [self.string phc_allRangesOfSubString:self.property.operaString];
     NSInteger index = self.property.local >= ranges.count ? 0 : self.property.local;
     return NSRangeFromString(ranges[index]);
 }
